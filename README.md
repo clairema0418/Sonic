@@ -101,7 +101,19 @@ or manully download [pretrain model](https://drive.google.com/drive/folders/1oe8
   '/path/to/output_video'
 ```
 
+```shell 
+python3 demo.py input/girl_01.png input/audio/hello.m4a output/girl_01.mp4
+python3 demo.py input/girl_02.png input/audio/hello.m4a output/girl_02.mp4
+python3 demo.py input/girl_03.png input/audio/hello.m4a output/girl_03.mp4
+python3 demo.py input/girl_04.png input/audio/hello.m4a output/girl_04.mp4
+python3 demo.py input/girl_05.png input/audio/hello.m4a output/girl_05.mp4
 
+python3 demo.py input/boy1.png input/audio/dean.m4a output/boy1.mp4
+python3 demo.py input/boy2.png input/audio/doctor.m4a output/boy2.mp4
+python3 demo.py input/boy3.png input/audio/doctor.m4a output/boy3.mp4
+python3 demo.py input/boy4.png input/audio/doctor.m4a output/boy4.mp4
+python3 demo.py input/boy5.png input/audio/doctor.m4a output/boy5.mp4
+```
 
  
 ## 🔗 Citation

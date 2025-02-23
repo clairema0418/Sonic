@@ -15,3 +15,5 @@ accelerate
 pillow>=9.0.0           # 用於圖像操作，可能用於讀取或保存圖像
 numpy>=1.21.0           # 用於數值計算，Sonic 可能依賴其進行數據處理
 torch>=2.0.0            # PyTorch 主套件，Sonic 的核心依賴
+huggingface_hub>=0.23.0
+omegaconf>=2.3.0

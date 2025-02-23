@@ -139,3 +139,4 @@ input/
 output/
 *.cog/
 replicate.md
+checkpoints/

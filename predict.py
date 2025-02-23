@@ -1,12 +1,104 @@
 from cog import BasePredictor, Input, Path
 import os
 from sonic import Sonic
+from huggingface_hub import hf_hub_download, snapshot_download
+import time
+import warnings
+
+# 忽略特定的警告
+warnings.filterwarnings("ignore", category=FutureWarning)
+warnings.filterwarnings("ignore", category=UserWarning)
 
 class Predictor(BasePredictor):
     def setup(self):
         """初始化 Sonic 模型"""
-        # 初始化 Sonic，假設參數 0 表示使用第一個 GPU
-        self.pipe = Sonic(0)
+        # 定義模型路徑
+        checkpoint_dir = "/src/checkpoints"
+        model_paths = {
+            "svd": f"{checkpoint_dir}/stable-video-diffusion-img2vid-xt",
+            "sonic": f"{checkpoint_dir}/Sonic",
+            "whisper": f"{checkpoint_dir}/whisper-tiny",
+            "rife": f"{checkpoint_dir}/RIFE"
+        }
+
+        # 確保檢查點目錄存在
+        os.makedirs(checkpoint_dir, exist_ok=True)
+
+        # 設定下載參數
+        max_retries = 3
+
+        def download_with_retry(func, **kwargs):
+            for attempt in range(max_retries):
+                try:
+                    common_args = {
+                        "token": os.getenv("HUGGING_FACE_HUB_TOKEN")
+                    }
+                    
+                    if func == snapshot_download:
+                        return func(
+                            repo_id=kwargs["repo_id"],
+                            local_dir=kwargs["local_dir"],
+                            **common_args
+                        )
+                    else:  # hf_hub_download
+                        return func(
+                            repo_id=kwargs["repo_id"],
+                            filename=kwargs["filename"],
+                            local_dir=kwargs["local_dir"],
+                            timeout=60,
+                            **common_args
+                        )
+                except Exception as e:
+                    if attempt == max_retries - 1:
+                        raise Exception(f"下載失敗，已重試 {max_retries} 次: {str(e)}")
+                    print(f"下載失敗，等待5秒後重試... (嘗試 {attempt + 1}/{max_retries})")
+                    print(f"錯誤信息: {str(e)}")
+                    time.sleep(5)
+
+        try:
+            # 下載模型檔案
+            print("下載 Sonic 模型...")
+            download_with_retry(
+                snapshot_download,
+                repo_id="LeonJoe13/Sonic",
+                local_dir=model_paths["sonic"]
+            )
+
+            print("下載 Stable Video Diffusion 模型...")
+            download_with_retry(
+                snapshot_download,
+                repo_id="stabilityai/stable-video-diffusion-img2vid-xt",
+                local_dir=model_paths["svd"]
+            )
+
+            print("下載 Whisper Tiny 模型...")
+            download_with_retry(
+                snapshot_download,
+                repo_id="openai/whisper-tiny",
+                local_dir=model_paths["whisper"]
+            )
+
+            print("下載 RIFE 模型...")
+            download_with_retry(
+                hf_hub_download,
+                repo_id="LeonJoe13/Sonic",
+                filename="RIFE/flownet.pkl",
+                local_dir=model_paths["rife"]
+            )
+
+            print("下載 YOLOFace 模型...")
+            download_with_retry(
+                hf_hub_download,
+                repo_id="LeonJoe13/Sonic",
+                filename="yoloface_v5m.pt",
+                local_dir=checkpoint_dir
+            )
+
+        except Exception as e:
+            raise Exception(f"模型下載失敗: {str(e)}")
+
+        # 初始化 Sonic，傳入模型路徑
+        self.pipe = Sonic(0, model_path=model_paths)
 
     def predict(
         self,
@@ -44,7 +136,7 @@ class Predictor(BasePredictor):
             min_resolution=512,
             inference_steps=25,
             dynamic_scale=dynamic_scale,
-            seed=seed  # 如果 Sonic 的 process 支持 seed，否則移除
+            seed=seed
         )
 
         # 返回生成的影片路徑
