@@ -10,3 +10,8 @@ omegaconf==2.3.0
 tqdm==4.65.2
 librosa==0.10.2.post1
 einops==0.7.0
+opencv-python
+accelerate
+pillow>=9.0.0           # 用於圖像操作，可能用於讀取或保存圖像
+numpy>=1.21.0           # 用於數值計算，Sonic 可能依賴其進行數據處理
+torch>=2.0.0            # PyTorch 主套件，Sonic 的核心依賴

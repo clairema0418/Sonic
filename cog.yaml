@@ -1,0 +1,6 @@
+build:
+  gpu: true               # Sonic 需要 NVIDIA GPU
+  cuda: "11.8"            # 根據 PyTorch 版本選擇合適的 CUDA 版本
+  python_version: "3.10"  # 使用 Python 3.10
+  python_requirements: "requirements.txt"  # 指向依賴文件
+predict: "predict.py:Predictor"  # 指定預測腳本和類

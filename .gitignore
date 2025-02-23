@@ -134,3 +134,8 @@ dmypy.json
 res_path/
 tmp_path/
 flagged/
+
+input/
+output/
+*.cog/
+replicate.md
